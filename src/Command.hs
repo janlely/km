@@ -5,25 +5,16 @@ module Command
 
 import Key (
     Input(..)
-    -- , Output(..)
     , Config(..)
     , PasswordCfg(..)
-    -- , ContentType(..)
     )
 import qualified Options.Applicative as OA
-import Options.Applicative ((<|>), (<**>))
+import Options.Applicative ((<**>))
 
-data Command = ADD Input | QUERY String | GET Int | GENERATE Config | LIST deriving Show
-
--- typeParser :: OA.Parser ContentType
--- typeParser = OA.option OA.auto (OA.long "type"
---                                   <> OA.short 't'
---                                   <> OA.help "content type, R for RawText, H for Hexed string, B for Base64 string"
---                                   <> OA.metavar "<CONTENT TYPE>")
+data Command = ADD Input | QUERY String | GET Int | DEL [Int] | GENERATE Config | LIST deriving Show
 
 
 inputParser :: OA.Parser Input
--- inputParser = Input <$> typeParser
 inputParser = Input <$> OA.strOption (OA.long "username"
                                              <> OA.short 'u'
                                              <> OA.help "username"
@@ -37,9 +28,6 @@ inputParser = Input <$> OA.strOption (OA.long "username"
                                         <> OA.help "key description"
                                         <> OA.metavar "<DESCRIPTION>")
 
--- outputParser :: OA.Parser Output
--- outputParser = Output <$> OA.option OA.auto (OA.long "id" <> OA.help "key id" <> OA.metavar "<ID>")
---                       <*> typeParser
 
 generateParser :: OA.Parser Config
 generateParser = PASSWORD <$> passwordCfgParser 
@@ -52,9 +40,10 @@ generateParser = PASSWORD <$> passwordCfgParser
                                         <*> OA.strOption (OA.long "desc" <> OA.short 'd' <> OA.help "description" <> OA.metavar "<DESCRIPTION>")
 
 cmdParser :: OA.Parser Command
-cmdParser = OA.subparser (input <> query <> output <> generate <> list)
+cmdParser = OA.subparser (input <> query <> output <> generate <> list <> del)
   where input = OA.command "add" (OA.info (ADD <$> inputParser <**> OA.helper) (OA.progDesc "input a new key"))
         query = OA.command "query" (OA.info (QUERY <$> OA.strArgument (OA.metavar "<KEY WORDS>")) (OA.progDesc "query key"))
-        output = OA.command "get" (OA.info (GET <$> OA.argument OA.auto (OA.metavar "<id>") <**> OA.helper) (OA.progDesc "output the key"))
+        output = OA.command "get" (OA.info (GET <$> OA.argument OA.auto (OA.metavar "<id>") <**> OA.helper) (OA.progDesc "get key by id"))
         generate = OA.command "generate" (OA.info (GENERATE <$> generateParser <**> OA.helper) (OA.progDesc "generate a new key"))
         list = OA.command "list" (OA.info (pure LIST) (OA.progDesc "list all keys"))
+        del = OA.command "del" (OA.info (DEL <$> OA.many (OA.argument OA.auto (OA.metavar "<id>")) <**> OA.helper) (OA.progDesc "delete key by id"))

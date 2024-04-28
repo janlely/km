@@ -25,5 +25,5 @@ main = do
         GET i -> getKey i conn
         GENERATE cfg -> generateKey cfg conn
         LIST -> listKeys conn
+        DEL i -> delKey i conn
     close conn 
-    -- print =<< execParser opts

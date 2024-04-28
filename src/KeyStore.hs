@@ -5,19 +5,15 @@ module KeyStore
     , getKey
     , generateKey
     , listKeys
+    , delKey
     ) where
 
 import Database.SQLite.Simple
--- import Database.SQLite.Simple.FromRow
 import Key
 import qualified Data.Text as T
 import Control.Monad
 import System.Random
 import Data.Char
-
--- import qualified Data.ByteString as BS
-
-
 
 
 
@@ -65,3 +61,11 @@ listKeys conn = do
     xs <- query_ conn "SELECT id,username,password,desc FROM key"  :: IO [(Int,T.Text, T.Text, T.Text)]
     forM_ xs $ \(i,username,password,desc) ->
       putStrLn $ show i ++ " | " ++ T.unpack username ++ " | " ++  T.unpack password ++ " | " ++ T.unpack desc
+
+
+delKey :: [Int] -> Connection -> IO ()
+delKey is conn = do
+    let placeholders = mconcat (replicate (length is) "?,")
+        queryStr = "DELETE FROM key WHERE id IN (" ++ init placeholders ++ ")"
+    execute conn (Query (T.pack queryStr)) is
+    putStrLn "OK"
