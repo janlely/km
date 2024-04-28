@@ -60,7 +60,7 @@ listKeys :: Connection -> IO ()
 listKeys conn = do
     xs <- query_ conn "SELECT id,username,password,desc FROM key"  :: IO [(Int,T.Text, T.Text, T.Text)]
     forM_ xs $ \(i,username,password,desc) ->
-      putStrLn $ show i ++ " | " ++ T.unpack username ++ " | " ++  T.unpack password ++ " | " ++ T.unpack desc
+      putStrLn $ show i ++ " | " ++ T.unpack username ++ " | " ++  desensitize (T.unpack password) ++ " | " ++ T.unpack desc
 
 
 delKey :: [Int] -> Connection -> IO ()
@@ -69,3 +69,7 @@ delKey is conn = do
         queryStr = "DELETE FROM key WHERE id IN (" ++ init placeholders ++ ")"
     execute conn (Query (T.pack queryStr)) is
     putStrLn "OK"
+
+
+desensitize :: String -> String 
+desensitize s = replicate (length s) '*'
