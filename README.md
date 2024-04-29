@@ -57,6 +57,14 @@ Available options:
 
 ```bash
 Usage: km del [<id>]
+
+  delete key by id
+
+Available options:
+  -h,--help                Show this help text
+```
+
+  
 ```bash
 km generate --help
 Usage: km generate <LENGTH> --username <USERNAME> [-u|--upper-case]
@@ -73,11 +81,5 @@ Available options:
   -n,--number              with number required
   -s,--special             with special char required
   -d,--desc <DESCRIPTION>  description
-  -h,--help                Show this help text
-```
-
-  delete key by id
-
-Available options:
   -h,--help                Show this help text
 ```
