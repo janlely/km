@@ -57,6 +57,24 @@ Available options:
 
 ```bash
 Usage: km del [<id>]
+```bash
+km generate --help
+Usage: km generate <LENGTH> --username <USERNAME> [-u|--upper-case]
+                   [-l|--lower-case] [-n|--number] [-s|--special]
+                   (-d|--desc <DESCRIPTION>)
+
+  generate a new key
+
+Available options:
+  <LENGTH>                 length of the password
+  --username <USERNAME>    username
+  -u,--upper-case          with upper case required
+  -l,--lower-case          with lower case required
+  -n,--number              with number required
+  -s,--special             with special char required
+  -d,--desc <DESCRIPTION>  description
+  -h,--help                Show this help text
+```
 
   delete key by id
 
