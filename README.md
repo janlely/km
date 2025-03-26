@@ -1,5 +1,5 @@
 # km
-a key manage tool
+a password manage tool
 
 ```bash
 km --help
