@@ -24,7 +24,6 @@ dependencies:
 - optparse-applicative
 - bytestring
 - text
-- sqlite-simple
 - raw-strings-qq
 - directory
 - filepath
@@ -34,7 +33,6 @@ dependencies:
 - memory
 - store
 - containers
-# - lens
 
 ghc-options:
 - -Wall
