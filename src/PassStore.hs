@@ -48,7 +48,7 @@ getPasswordStore key = do
 
 insertKey :: Input -> IO ()
 insertKey input = do 
-  pass <- to32 . TE.encodeUtf8 . T.pack <$> getPassword
+  pass <- getPassword'
   passStore <- getPasswordStore pass
   let i :: Int = fromJust $ DL.find (`MS.notMember` passStore) [1..]
   let entry = PasswordEntry i (_username input) (_password input) (_desc input)
@@ -61,15 +61,15 @@ insertKey input = do
 
 queryKey :: T.Text -> IO ()
 queryKey keyWords = do 
-  pass <- to32 . TE.encodeUtf8 . T.pack <$> getPassword
+  pass <- getPassword'
   passStore <- getPasswordStore pass
   let matches = DL.filter (T.isInfixOf keyWords . _notes . snd) (MS.toList passStore)
-  mapM_ print matches
+  mapM_ print $ snd <$> matches
   
 
 getKey :: Int -> IO ()
 getKey i = do
-  pass <- to32 . TE.encodeUtf8 . T.pack <$> getPassword
+  pass <- getPassword'
   passStore <- getPasswordStore pass
   case MS.lookup i passStore of
     Just pe -> putStrLn $ T.unpack (_username0 pe) ++ " | " ++ T.unpack (_password0 pe)
@@ -98,14 +98,14 @@ generatePassword cfg@(PasswordCfg len _ u l n s  _) = do
 
 listKeys :: IO ()
 listKeys = do
-  pass <- to32 . TE.encodeUtf8 . T.pack <$> getPassword
+  pass <- getPassword'
   passStore <- getPasswordStore pass
   mapM_ print $ (fmap snd . MS.toList) passStore
 
 
 delKey :: [Int] -> IO ()
 delKey is = do
-  pass <- to32 . TE.encodeUtf8 . T.pack <$> getPassword
+  pass <- getPassword'
   passStore <- getPasswordStore pass
   let newStore = DL.foldl (flip MS.delete) passStore is
   let bin = DS.encode newStore
@@ -114,30 +114,6 @@ delKey is = do
   BS.writeFile dbPath (BS.append iv bin')
 
 
--- desensitize :: String -> String 
--- desensitize _ = replicate 10 '*'
-
-
--- makeSecretKey :: IO ()
--- makeSecretKey = do
---     pass <- to32 . TE.encodeUtf8 . T.pack <$> getPassword
---     secret <- makeSecret
---     (pass', iv) <- encrypt secret pass
---     homeDir <- getHomeDirectory
---     let keyPath = homeDir </> ".km/key.txt"
---     exists <- doesFileExist keyPath
---     when exists $ do 
---       putStr "密钥文件已存在，是否重新生成？[Yes] or [No]: "
---       answer <- getLine
---       when (answer /= "Yes") System.Exit.exitSuccess
---     appendFile keyPath $ T.unpack $ encodeBase64 pass'
---     appendFile keyPath getNativeNewline 
---     appendFile keyPath $ T.unpack $ encodeBase64 iv
---     putStrLn "密钥创建成功"
---   where  getNativeNewline :: String
---          getNativeNewline = case nativeNewline of
---                               CRLF -> "\r\n"  -- Windows 换行符
---                               LF   -> "\n"    -- Unix/Linux/macOS 换行符
     
 to32 :: BS.ByteString -> BS.ByteString
 to32 bs = let len = BS.length bs
@@ -146,25 +122,8 @@ to32 bs = let len = BS.length bs
                 else BS.append bs $ BS.replicate (32 - len) 0
 
 
--- getSecretKey :: IO BS.ByteString
--- getSecretKey = do
---     homeDir <- getHomeDirectory
---     let keyPath = homeDir </> ".km/key.txt"
---     exists <- doesFileExist keyPath
---     unless exists $ do
---         putStr "密钥文件不存在，是否创建？[Yes] or [No]: "
---         hFlush stdout
---         yes <- (== "Yes") <$> getLine
---         when yes makeSecretKey
---     pass <- to32 . TE.encodeUtf8 . T.pack <$> getPassword
---     handle <- openFile keyPath ReadMode
---     key <- decodeBase64 . T.pack <$> hGetLine handle
---     iv <- decodeBase64 . T.pack <$> hGetLine handle
---     return $ decrypt key pass iv 
-    
-    
-    
-
+getPassword' :: IO BS.ByteString
+getPassword' = to32 . TE.encodeUtf8 . T.pack <$> getPassword
 
 getPassword :: IO String
 getPassword = do

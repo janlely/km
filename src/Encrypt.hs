@@ -26,9 +26,6 @@ import qualified Data.Text.Encoding as TE
 data Key c a where
   Key :: (BlockCipher c, ByteArray a) => a -> Key c a
 
--- | Generates a string of bytes (key) of a specific length for a given block cipher
--- genSecretKey :: forall m c a. (CRT.MonadRandom m, BlockCipher c, ByteArray a) => c -> Int -> m (Key c a)
--- genSecretKey _ = fmap Key . CRT.getRandomBytes
 
 makeSecret :: forall m . (CRT.MonadRandom m) =>  m ByteString
 makeSecret = CRT.getRandomBytes 32 
@@ -48,7 +45,7 @@ initCipher (Key k) = case cipherInit k of
 
 -- 将 IV c 转换为 ByteString
 ivToByteString :: BlockCipher c => IV c -> ByteString
-ivToByteString iv = convert iv
+ivToByteString = convert
 
 encrypt' :: (BlockCipher c, ByteArray a) => Key c a -> IV c -> a -> Either CryptoError a
 encrypt' secretKey initIV msg =
