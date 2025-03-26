@@ -30,10 +30,8 @@ data Key c a where
 -- genSecretKey :: forall m c a. (CRT.MonadRandom m, BlockCipher c, ByteArray a) => c -> Int -> m (Key c a)
 -- genSecretKey _ = fmap Key . CRT.getRandomBytes
 
-makeSecret :: forall m . (CRT.MonadRandom m) =>  m T.Text
-makeSecret = do
-  bytes :: ByteString <- CRT.getRandomBytes 32 
-  return $ encodeBase64 bytes
+makeSecret :: forall m . (CRT.MonadRandom m) =>  m ByteString
+makeSecret = CRT.getRandomBytes 32 
 
 
 -- | Generate a random initialization vector for a given block cipher
