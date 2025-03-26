@@ -11,7 +11,7 @@ import Key (
 import qualified Options.Applicative as OA
 import Options.Applicative ((<**>))
 
-data Command = ADD Input | QUERY String | GET Int | DEL [Int] | GENERATE Config | LIST | MAKESECRET deriving  Show
+data Command = ADD Input | QUERY String | GET Int | DEL [Int] | GENERATE Config | LIST deriving  Show
 
 
 inputParser :: OA.Parser Input
@@ -40,11 +40,10 @@ generateParser = PASSWORD <$> passwordCfgParser
                                         <*> OA.strOption (OA.long "desc" <> OA.short 'd' <> OA.help "description" <> OA.metavar "<DESCRIPTION>")
 
 cmdParser :: OA.Parser Command
-cmdParser = OA.subparser (input <> query <> output <> generate <> list <> del <> makeSecret)
+cmdParser = OA.subparser (input <> query <> output <> generate <> list <> del)
   where input = OA.command "add" (OA.info (ADD <$> inputParser <**> OA.helper) (OA.progDesc "input a new key"))
         query = OA.command "query" (OA.info (QUERY <$> OA.strArgument (OA.metavar "<KEY WORDS>")) (OA.progDesc "query key"))
         output = OA.command "get" (OA.info (GET <$> OA.argument OA.auto (OA.metavar "<id>") <**> OA.helper) (OA.progDesc "get key by id"))
         generate = OA.command "generate" (OA.info (GENERATE <$> generateParser <**> OA.helper) (OA.progDesc "generate a new key"))
         list = OA.command "list" (OA.info (pure LIST) (OA.progDesc "list all keys"))
         del = OA.command "del" (OA.info (DEL <$> OA.many (OA.argument OA.auto (OA.metavar "<id>")) <**> OA.helper) (OA.progDesc "delete key by id"))
-        makeSecret = OA.command "make-key" (OA.info (pure MAKESECRET) (OA.progDesc "make a secret key"))

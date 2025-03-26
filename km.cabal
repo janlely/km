@@ -28,7 +28,7 @@ library
       Command
       Encrypt
       Key
-      KeyStore
+      PassStore
   other-modules:
       Paths_km
   autogen-modules:
@@ -40,6 +40,7 @@ library
       base >=4.7 && <5
     , base64-bytestring
     , bytestring
+    , containers
     , cryptonite
     , directory
     , filepath
@@ -48,6 +49,7 @@ library
     , random
     , raw-strings-qq
     , sqlite-simple
+    , store
     , text
   default-language: Haskell2010
 
@@ -64,6 +66,7 @@ executable km
       base >=4.7 && <5
     , base64-bytestring
     , bytestring
+    , containers
     , cryptonite
     , directory
     , filepath
@@ -73,6 +76,7 @@ executable km
     , random
     , raw-strings-qq
     , sqlite-simple
+    , store
     , text
   default-language: Haskell2010
 
@@ -90,6 +94,7 @@ test-suite km-test
       base >=4.7 && <5
     , base64-bytestring
     , bytestring
+    , containers
     , cryptonite
     , directory
     , filepath
@@ -99,5 +104,6 @@ test-suite km-test
     , random
     , raw-strings-qq
     , sqlite-simple
+    , store
     , text
   default-language: Haskell2010

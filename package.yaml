@@ -32,6 +32,8 @@ dependencies:
 - cryptonite
 - base64-bytestring
 - memory
+- store
+- containers
 # - lens
 
 ghc-options:

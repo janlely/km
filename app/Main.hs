@@ -4,10 +4,8 @@ module Main (main) where
 
 import Command
 import Options.Applicative (execParser, info, helper, fullDesc, header, progDesc, (<**>))
-import Database.SQLite.Simple
-import KeyStore
-import System.Directory (getHomeDirectory)
-import System.FilePath ((</>))
+import PassStore
+import qualified Data.Text as T
 
 
 
@@ -16,17 +14,22 @@ opts = info (cmdParser <**> helper) (fullDesc <> progDesc "Key Manager" <> heade
 
 main :: IO ()
 main = do
-    homeDir <- getHomeDirectory
-    let dbPath = homeDir </> ".km/keys.db"
-    conn <- open dbPath 
+    -- homeDir <- getHomeDirectory
+    -- let dbPath = homeDir </> ".km/keys.db"
+    -- conn <- open dbPath 
     cmd <- execParser opts
-    execute_ conn "CREATE TABLE IF NOT EXISTS key (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, iv TEXT, desc TEXT);"
+    -- execute_ conn "CREATE TABLE IF NOT EXISTS key (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, iv TEXT, desc TEXT);"
     case cmd of
-        ADD input -> insertKey input conn
-        QUERY keyWords -> queryKey keyWords conn
-        GET i -> getKey i conn
-        GENERATE cfg -> generateKey cfg conn
-        LIST -> listKeys conn
-        DEL i -> delKey i conn
-        MAKESECRET -> makeSecretKey
-    close conn 
+        ADD input -> insertKey input
+        QUERY keyWords -> queryKey $ T.pack keyWords
+        GET i -> getKey i
+        GENERATE cfg -> generateKey cfg
+        LIST -> listKeys
+        DEL i -> delKey i
+
+main :: IO ()
+main = do
+    homeDir <- getHomeDirectory
+    let dbPath = homeDir </> ".km/key.db"
+    conn <- open dbPath 
+    
