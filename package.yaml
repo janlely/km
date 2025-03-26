@@ -29,6 +29,9 @@ dependencies:
 - directory
 - filepath
 - random
+- cryptonite
+- base64-bytestring
+- memory
 # - lens
 
 ghc-options:

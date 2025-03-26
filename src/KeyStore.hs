@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module KeyStore 
     ( insertKey
     , queryKey
@@ -6,21 +7,34 @@ module KeyStore
     , generateKey
     , listKeys
     , delKey
+    , makeSecretKey
     ) where
 
 import Database.SQLite.Simple
 import Key
 import qualified Data.Text as T
-import Control.Monad
 import System.Random
 import Data.Char
 
+import System.Directory (getHomeDirectory)
+import System.FilePath ((</>))
+import System.IO (openFile, hGetLine, IOMode(..))
+import Control.Monad (forM_)
+
+import qualified Data.Text.Encoding as TE
+import Encrypt (encrypt, decrypt, encodeBase64, decodeBase64, makeSecret)
 
 
 
 insertKey :: Input -> Connection -> IO ()
-insertKey input conn = execute conn "INSERT INTO key (username, password, desc) VALUES (?,?,?)"
-                        [_username input, _password input, _desc input]
+insertKey input conn = do 
+    homeDir <- getHomeDirectory
+    let keyPath = homeDir </> ".km/key.txt"
+    handle <- openFile keyPath ReadMode
+    key <- decodeBase64 . T.pack <$> hGetLine handle
+    (key', iv) <- encrypt (TE.encodeUtf8 $ _password input) key 
+    execute conn "INSERT INTO key (username, password, iv, desc) VALUES (?,?,?,?)"
+                        [_username input, encodeBase64 key', encodeBase64 iv, _desc input]
 
 queryKey :: String -> Connection -> IO ()
 queryKey keyWords conn = do 
@@ -30,15 +44,20 @@ queryKey keyWords conn = do
 
 getKey :: Int -> Connection -> IO ()
 getKey i conn = do
-    xs <- query conn "SELECT username,password FROM key WHERE id = ?" (Only (i :: Int)) :: IO [(T.Text, T.Text)]
-    forM_ xs $ \(username,password) ->
-      putStrLn $ T.unpack username ++ " | " ++  T.unpack password
+    xs <- query conn "SELECT username,password,iv FROM key WHERE id = ?" (Only (i :: Int)) :: IO [(T.Text, T.Text, T.Text)]
+    homeDir <- getHomeDirectory
+    let keyPath = homeDir </> ".km/key.txt"
+    handle <- openFile keyPath ReadMode
+    key <- T.pack <$> hGetLine handle
+    forM_ xs $ \(username,password, iv) ->
+      putStrLn $ T.unpack username ++ " | " ++ (T.unpack . TE.decodeUtf8) (decrypt (decodeBase64 password) (decodeBase64 key) (decodeBase64 iv))
 
 generateKey :: Config -> Connection -> IO ()
 generateKey (PASSWORD cfg) conn = do
     passwd <- generatePassword cfg
-    execute conn "INSERT INTO key (username, password, desc) VALUES (?,?,?)"
-        [_user cfg, passwd, _desc1 cfg]
+    insertKey (Input (_user cfg) passwd (_desc1 cfg)) conn
+    -- execute conn "INSERT INTO key (username, password, iv, desc) VALUES (?,?,?,?)"
+    --     [_user cfg, passwd, _desc1 cfg]
     putStrLn $ T.unpack passwd
 generateKey _ _ = error "unsupported config type"
 
@@ -72,4 +91,8 @@ delKey is conn = do
 
 
 desensitize :: String -> String 
-desensitize s = replicate (length s) '*'
+desensitize _ = replicate 10 '*'
+
+
+makeSecretKey :: IO ()
+makeSecretKey = makeSecret >>= putStrLn . T.unpack

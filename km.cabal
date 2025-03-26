@@ -1,6 +1,6 @@
 cabal-version: 2.2
 
--- This file has been generated from package.yaml by hpack version 0.36.0.
+-- This file has been generated from package.yaml by hpack version 0.37.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Command
+      Encrypt
       Key
       KeyStore
   other-modules:
@@ -37,9 +38,12 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , base64-bytestring
     , bytestring
+    , cryptonite
     , directory
     , filepath
+    , memory
     , optparse-applicative
     , random
     , raw-strings-qq
@@ -58,10 +62,13 @@ executable km
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , base64-bytestring
     , bytestring
+    , cryptonite
     , directory
     , filepath
     , km
+    , memory
     , optparse-applicative
     , random
     , raw-strings-qq
@@ -81,10 +88,13 @@ test-suite km-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , base64-bytestring
     , bytestring
+    , cryptonite
     , directory
     , filepath
     , km
+    , memory
     , optparse-applicative
     , random
     , raw-strings-qq
