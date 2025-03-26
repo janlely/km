@@ -19,6 +19,7 @@ Available commands:
   generate                 generate a new key
   list                     list all keys
   del                      delete key by id
+  make-key                 make a secret key
 ```
 
 ```bash
