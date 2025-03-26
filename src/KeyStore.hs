@@ -2,14 +2,14 @@
 
 module KeyStore 
     ( insertKey
-    , insertKey'
+    -- , insertKey'
     , queryKey
     , getKey
     , generateKey
     , listKeys
     , delKey
     , makeSecretKey
-    , getSecretKey
+    -- , getSecretKey
     ) where
 
 import Database.SQLite.Simple
@@ -28,15 +28,14 @@ import qualified Data.Text.Encoding as TE
 import Encrypt (encrypt, decrypt, encodeBase64, decodeBase64, makeSecret)
 import qualified System.Exit
 import qualified Data.ByteString as BS
-import GHC.Exception (getCallStack)
 
 
 
-insertKey' :: BS.ByteString -> Input -> Connection -> IO ()
-insertKey' bs input conn = do 
-    (key', iv) <- encrypt (TE.encodeUtf8 $ _password input) bs
-    execute conn "INSERT INTO key (username, password, iv, desc) VALUES (?,?,?,?)"
-                        [_username input, encodeBase64 key', encodeBase64 iv, _desc input]
+-- insertKey' :: BS.ByteString -> Input -> Connection -> IO ()
+-- insertKey' bs input conn = do 
+--     (key', iv) <- encrypt (TE.encodeUtf8 $ _password input) bs
+--     execute conn "INSERT INTO key (username, password, iv, desc) VALUES (?,?,?,?)"
+--                         [_username input, encodeBase64 key', encodeBase64 iv, _desc input]
 
 
 insertKey :: Input -> Connection -> IO ()
