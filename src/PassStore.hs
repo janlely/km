@@ -3,7 +3,6 @@
 
 module PassStore 
     ( insertKey
-    , queryKey
     , getKey
     , generateKey
     , listKeys
@@ -59,12 +58,12 @@ insertKey input = do
   BS.writeFile dbPath (BS.append iv bin')
 
 
-queryKey :: T.Text -> IO ()
-queryKey keyWords = do 
-  pass <- getPassword'
-  passStore <- getPasswordStore pass
-  let matches = DL.filter (T.isInfixOf keyWords . _notes . snd) (MS.toList passStore)
-  mapM_ print $ snd <$> matches
+-- queryKey :: T.Text -> IO ()
+-- queryKey keyWords = do 
+--   pass <- getPassword'
+--   passStore <- getPasswordStore pass
+--   let matches = DL.filter (T.isInfixOf keyWords . _notes . snd) (MS.toList passStore)
+--   mapM_ print $ snd <$> matches
   
 
 getKey :: Int -> IO ()

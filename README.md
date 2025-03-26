@@ -14,7 +14,6 @@ Available options:
 
 Available commands:
   add                      input a new key
-  query                    query key
   get                      get key by id
   generate                 generate a new key
   list                     list all keys
@@ -37,15 +36,6 @@ Available options:
   -h,--help                Show this help text
 ```
 
-```bash
-km query --help
-Usage: km query <KEY WORDS>
-
-  query key
-
-Available options:
-  -h,--help                Show this help text
-```
 ```bash
 km get --help
 Usage: km get <id>
