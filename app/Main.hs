@@ -15,7 +15,6 @@ main = do
     cmd <- execParser opts
     case cmd of
         ADD input -> insertKey input
-        -- QUERY keyWords -> queryKey $ T.pack keyWords
         GET i -> getKey i
         GENERATE cfg -> generateKey cfg
         LIST -> listKeys
