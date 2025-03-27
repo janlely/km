@@ -140,7 +140,7 @@ getPassword = do
     writeFile tmpFile $ pass ++ "\0" ++ show curTime
   (pass', time) <- span (/= '\0') <$> readFile tmpFile
   curTime' <- getCurrentTime
-  let expiredTime :: Double = realToFrac $ diffUTCTime curTime' (read $drop 1 time)
+  let expiredTime :: Double = realToFrac $ diffUTCTime curTime' (read $ drop 1 time)
   if expiredTime > 600
     then removeFile tmpFile >> getPassword
     else return pass'
