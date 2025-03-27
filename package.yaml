@@ -33,6 +33,7 @@ dependencies:
 - memory
 - store
 - containers
+- time
 
 ghc-options:
 - -Wall

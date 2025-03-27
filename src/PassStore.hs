@@ -16,7 +16,7 @@ import System.Random
 import Data.Char
 
 import Encrypt
-import System.Directory (getHomeDirectory, doesFileExist)
+import System.Directory (getHomeDirectory, doesFileExist, getTemporaryDirectory, removeFile)
 import System.FilePath ((</>))
 import System.IO (hFlush, stdout, hGetEcho, hSetEcho, stdin)
 import Control.Exception (bracket_)
@@ -27,6 +27,8 @@ import qualified Data.Map.Strict as MS
 import qualified Data.Store as DS
 import qualified Data.List as DL
 import Data.Maybe (fromJust)
+import Control.Monad (unless)
+import Data.Time.Clock
 
 getDBPath :: IO FilePath
 getDBPath = do
@@ -126,11 +128,22 @@ getPassword' = to32 . TE.encodeUtf8 . T.pack <$> getPassword
 
 getPassword :: IO String
 getPassword = do
-  putStr "请输入密码: "
-  hFlush stdout
-  pass <- withEcho False getLine
-  putChar '\n'
-  return pass
+  tmpDir <- getTemporaryDirectory
+  let tmpFile = tmpDir </> "km-password.txt"
+  exists <- doesFileExist tmpFile
+  unless exists $ do
+    putStr "请输入密码: "
+    hFlush stdout
+    pass <- withEcho False getLine
+    putChar '\n'
+    curTime <- getCurrentTime
+    writeFile tmpFile $ pass ++ "\0" ++ show curTime
+  (pass', time) <- span (/= '\0') <$> readFile tmpFile
+  curTime' <- getCurrentTime
+  let expiredTime :: Double = realToFrac $ diffUTCTime curTime' (read $drop 1 time)
+  if expiredTime > 600
+    then removeFile tmpFile >> getPassword
+    else return pass'
 
 withEcho :: Bool -> IO a -> IO a
 withEcho echo action = do
